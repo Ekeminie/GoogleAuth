@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">GoogleAuth</string>
+
+    <string name="web_client_id">640000511533-k8uk7khjln69in9lq8btfou6fsabl335.apps.googleusercontent.com</string>
+    <string name="title_activity_logged_in">Authenticated</string>
+</resources>

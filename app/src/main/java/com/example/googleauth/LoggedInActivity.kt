@@ -22,7 +22,7 @@ class LoggedInActivity : AppCompatActivity() {
         setContentView(R.layout.activity_logged_in)
         setSupportActionBar(toolbar)
 
-        setupUI()
+        initializeUI()
 
         fab.setOnClickListener { view ->
             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
@@ -30,13 +30,13 @@ class LoggedInActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupUI() {
+    private fun initializeUI() {
         sign_out_button.setOnClickListener {
-            signOut()
+            logout()
         }
     }
 
-    private fun signOut() {
+    private fun logout() {
         startActivity(MainActivity.getLaunchIntent(this))
         FirebaseAuth.getInstance().signOut();
     }

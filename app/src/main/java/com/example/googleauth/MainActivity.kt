@@ -4,10 +4,6 @@ import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import androidx.core.app.ComponentActivity
-import androidx.core.app.ComponentActivity.ExtraData
-import androidx.core.content.ContextCompat.getSystemService
-import android.icu.lang.UCharacter.GraphemeClusterBreak.T
 import android.widget.Toast
 import com.google.android.gms.auth.api.signin.*
 import com.google.android.gms.common.api.ApiException
@@ -20,17 +16,18 @@ import kotlinx.android.synthetic.main.activity_main.*
 class MainActivity : AppCompatActivity() {
 
     val RC_SIGN_IN: Int = 1
-    lateinit var mGoogleSignInClient: GoogleSignInClient
-    lateinit var mGoogleSignInOptions: GoogleSignInOptions
-    private lateinit var firebaseAuth: FirebaseAuth
+    lateinit var signInClient: GoogleSignInClient
+    lateinit var signInOptions: GoogleSignInOptions
+    private lateinit var auth: FirebaseAuth
 
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        firebaseAuth = FirebaseAuth.getInstance()
-        setupUI()
+        auth = FirebaseAuth.getInstance()
+        initializeUI()
+        setupGoogleLogin()
         
     }
 
@@ -50,15 +47,15 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupUI() {
+    private fun initializeUI() {
         google_button.setOnClickListener {
-            signIn()
+            login()
         }
     }
 
-    private fun signIn() {
-            val signInIntent: Intent = mGoogleSignInClient.signInIntent
-            startActivityForResult(signInIntent, RC_SIGN_IN)
+    private fun login() {
+            val loginIntent: Intent = signInClient.signInIntent
+            startActivityForResult(loginIntent, RC_SIGN_IN)
 
     }
 
@@ -69,7 +66,7 @@ class MainActivity : AppCompatActivity() {
             try {
                 val account = task.getResult(ApiException::class.java)
                 if (account != null) {
-                    firebaseAuthWithGoogle(account)
+                    googleFirebaseAuth(account)
                 }
             } catch (e: ApiException) {
                 Toast.makeText(this, "Google sign in failed:(", Toast.LENGTH_LONG).show()
@@ -77,9 +74,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun firebaseAuthWithGoogle(acct: GoogleSignInAccount) {
+    private fun googleFirebaseAuth(acct: GoogleSignInAccount) {
         val credential = GoogleAuthProvider.getCredential(acct.idToken, null)
-        firebaseAuth.signInWithCredential(credential).addOnCompleteListener {
+        auth.signInWithCredential(credential).addOnCompleteListener {
             if (it.isSuccessful) {
 
                 startActivity(LoggedInActivity.getLaunchIntent(this))
@@ -89,12 +86,12 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun configureGoogleSignIn() {
-        mGoogleSignInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+    private fun setupGoogleLogin() {
+        signInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken(getString(R.string.default_web_client_id))
             .requestEmail()
             .build()
-        mGoogleSignInClient = GoogleSignIn.getClient(this, mGoogleSignInOptions)
+        signInClient = GoogleSignIn.getClient(this, signInOptions)
     }
 
 
